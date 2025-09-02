@@ -116,6 +116,9 @@ return {
       },
     })
 
+    local lspconfig = require('lspconfig')
+    util = require('lspconfig.util')
+
     vim.lsp.config("gopls", {
       on_attach = function(client, bufnr)
         -- Optional: Set up keymaps or other actions that depend on the LSP client
@@ -132,7 +135,7 @@ return {
       capabilities = vim.lsp.protocol.make_client_capabilities(),
       cmd = { "gopls" },
       filetypes = { "go", "gomod", "gowork", "gotmpl" },
-      -- root_dir = vim.util.root_pattern("go.work", "go.mod", ".git"),
+      root_dir = util.root_pattern("go.work", "go.mod", ".git"),
       settings = {
         gopls = {
           completeUnimported = true,
