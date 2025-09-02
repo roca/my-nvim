@@ -12,7 +12,7 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
-require("lazy").setup("josean.plugins", {
+require("lazy").setup({ { import = "josean.plugins" }, { import = "josean.plugins.lsp" } }, {
   checker = {
     enabled = true,
     notify = false,
