@@ -116,38 +116,31 @@ return {
       },
     })
 
-    local lspconfig = require('lspconfig')
-    util = require('lspconfig.util')
+   local on_attach = require("josean.configs.lspconfig").on_attach
+   local capabilities = require("josean.configs.lspconfig").capabilities
 
-    vim.lsp.config("gopls", {
-      on_attach = function(client, bufnr)
-        -- Optional: Set up keymaps or other actions that depend on the LSP client
-        -- For example, you might set up formatting on save here
-        vim.api.nvim_create_autocmd("BufWritePre", {
-          group = vim.api.nvim_create_augroup("LspFormating", { clear = true }),
-          pattern = "*.go",
-          buffer = bufnr,
-          callback = function()
-            vim.lsp.buf.format({ async = false })
-          end,
-        })
-      end,
-      capabilities = vim.lsp.protocol.make_client_capabilities(),
+   local lspconfig = require('lspconfig')
+   local util = require "lspconfig/util"
+
+   lspconfig.gopls.setup {
+      on_attach = on_attach,
+      capabilities = capabilities,
       cmd = { "gopls" },
-      filetypes = { "go", "gomod", "gowork", "gotmpl" },
-      root_dir = util.root_pattern("go.work", "go.mod", ".git"),
+      filetypes = { "go", "gowork", "gomod", "gotmpl" },
+      root_dir = util.root_pattern("go.work", "go.mod", ".git" ),
       settings = {
         gopls = {
           completeUnimported = true,
           usePlaceholders = true,
           analyses = {
-            unusedparams = true,
+              unusedparams = true,
           },
-          -- Add any other gopls-specific settings here
-          -- buildFlags = { "-tags=integration" }, -- Example of adding build flags
+          staticcheck = true,
+          gofumpt = true,
         },
       },
-    })
+    }
+
 
 
   end,
