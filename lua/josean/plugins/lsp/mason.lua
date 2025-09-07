@@ -38,7 +38,7 @@ return {
 				-- "prismals",
 				-- "pyright",
 				-- "eslint",
-				-- "gopls",
+				"gopls",
 			},
 		})
 
