@@ -1,14 +1,15 @@
 vim.g.mapleader = " "
 
 local keymap = vim.keymap -- for conciseness
+local fn = vim.fn -- for conciseness
 
-keymap.set("i", "jk", "<ESC>", {desc = "Exit insert mode with jk"})
+keymap.set("i", "jk", "<ESC>", { desc = "Exit insert mode with jk" })
 
-keymap.set("n", "<leader>nh", ":nohl<CR>", { desc = "Clear search highlights"})
+keymap.set("n", "<leader>nh", ":nohl<CR>", { desc = "Clear search highlights" })
 
 -- increment/decrement numbers
-keymap.set("n", "<leader>+", "<C-a>", { desc = "Increment number"}) -- increment
-keymap.set("n", "<leader>-", "<C-x>", { desc = "Decrement number"}) -- decrement
+keymap.set("n", "<leader>+", "<C-a>", { desc = "Increment number" }) -- increment
+keymap.set("n", "<leader>-", "<C-x>", { desc = "Decrement number" }) -- decrement
 
 -- window management
 keymap.set("n", "<leader>sv", "<C-w>v", { desc = "Split window vertically" }) -- split window vertically
@@ -22,3 +23,9 @@ keymap.set("n", "<leader>tn", "<cmd>tabn<CR>", { desc = "Go to next tab" }) --  
 keymap.set("n", "<leader>tp", "<cmd>tabp<CR>", { desc = "Go to previou:w!s tab" }) --  go to previous tab
 keymap.set("n", "<leader>tf", "<cmd>tabnew %<CR>", { desc = "Open current buffer in new tab" }) --  move current buffer to new tab
 
+-- keymap.set("n", "<leader>cw", ':let @* = expand("%:h")<CR>', { desc = "Copy current working directory to clipboard" })
+
+keymap.set("n", "<leader>cd", function()
+	fn.setreg("+", fn.getcwd())
+	print("Current directory copied to clipboard!")
+end, { noremap = true, silent = true, desc = "Copy current directory to clipboard" })
