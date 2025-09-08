@@ -29,3 +29,5 @@ keymap.set("n", "<leader>cd", function()
 	fn.setreg("+", fn.getcwd())
 	print("Current directory copied to clipboard!")
 end, { noremap = true, silent = true, desc = "Copy current directory to clipboard" })
+
+keymap.set("n", "<leader>gh", ":lua vim.lsp.buf.hover()<CR>", { desc = "Inspect Go type" })
