@@ -30,4 +30,5 @@ keymap.set("n", "<leader>cd", function()
 	print("Current directory copied to clipboard!")
 end, { noremap = true, silent = true, desc = "Copy current directory to clipboard" })
 
+-- Golang
 keymap.set("n", "<leader>gh", ":lua vim.lsp.buf.hover()<CR>", { desc = "Inspect Go type" })
