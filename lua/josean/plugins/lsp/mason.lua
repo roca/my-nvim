@@ -39,6 +39,7 @@ return {
 				"pyright",
 				"eslint",
 				"gopls",
+				"templ",
 			},
 		})
 
