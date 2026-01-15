@@ -37,7 +37,7 @@ return {
 			})
 
 			-- Change the foreground color of the inline suggestions to a specific hex code
-			api.nvim_set_hl(0, "CopilotSuggestion", { fg = "#ada6a6" })
+			api.nvim_set_hl(0, "CopilotSuggestion", { fg = "#a855f7" })
 		end,
 	},
 }
