@@ -33,6 +33,7 @@ lua/josean/
 - Each plugin has its own configuration file in `lua/josean/plugins/`
 - Plugins are auto-imported from `josean.plugins` and `josean.plugins.lsp`
 - Plugin update checking is enabled but silent (no notifications)
+- Change detection is also silent (no notifications on config file changes)
 
 ## Key Keybindings
 
@@ -41,12 +42,15 @@ lua/josean/
 ### Essential Bindings
 - `jk` (insert mode): Exit to normal mode
 - `<leader>nh`: Clear search highlights
+- `<leader>+` / `<leader>-`: Increment/decrement numbers
+- `<leader>cd`: Copy current directory to clipboard
 - `<leader>ee`: Toggle file explorer (nvim-tree)
 - `<leader>ef`: Toggle file explorer on current file
 - `<leader>ff`: Fuzzy find files (Telescope)
 - `<leader>fs`: Live grep search (Telescope)
 - `<leader>fr`: Recent files (Telescope)
 - `<leader>ft`: Find todos (Telescope)
+- `<leader>se`: Search emojis (Telescope emoji picker)
 
 ### Window/Split Management
 - `<leader>sv`: Split vertically
@@ -60,6 +64,7 @@ lua/josean/
 - `<leader>tx`: Close current tab
 - `<leader>tn`: Next tab
 - `<leader>tp`: Previous tab
+- `<leader>tf`: Open current buffer in new tab
 
 ### LSP Keybindings (when LSP is attached)
 - `gR`: Show LSP references (Telescope)
@@ -79,6 +84,11 @@ lua/josean/
 ### Formatting & Linting
 - `<leader>mp`: Format file or range (conform.nvim)
 - `<leader>l`: Trigger linting manually
+
+### GitHub Copilot
+- `<Shift-Tab>` (insert mode): Accept Copilot suggestion
+- Copilot suggestions are shown in purple (`#a855f7`)
+- Auto-triggers in all filetypes by default
 
 ## Language Server & Tooling Setup
 
@@ -145,10 +155,16 @@ lua/josean/
 
 ### Display
 - Relative line numbers enabled
-- Line numbers colored yellow
+- Line numbers colored yellow (`LineNr` highlight group)
 - Cursor line highlighted
 - Sign column always visible (for diagnostics)
 - No line wrapping
+
+### Theme Customization
+- Uses **tokyonight.nvim** with "night" style
+- Custom color scheme with dark blue background (`#011628`)
+- Comments are bright yellow (`#ffff00`) for high visibility
+- Transparency can be toggled via `transparent` variable in `colorscheme.lua`
 
 ### Clipboard
 - Uses system clipboard (`unnamedplus`)
@@ -157,6 +173,23 @@ lua/josean/
 - Vertical splits open to the right
 - Horizontal splits open below
 
+## Additional Plugins & Features
+
+### Emoji Support
+- **emoji.nvim** plugin enabled for markdown files
+- Integrates with nvim-cmp for emoji completion
+- Accessible via Telescope with `<leader>se`
+
+### Comment Toggling
+- **Comment.nvim** for smart commenting
+- Context-aware comments for TSX/JSX/Svelte/HTML via treesitter integration
+- Standard comment keybindings: `gcc` (line), `gbc` (block), visual mode `gc`/`gb`
+
+### GitHub Copilot Integration
+- **copilot.lua** configured for AI-powered code suggestions
+- Suggestions auto-trigger in insert mode
+- Enabled for all major filetypes including markdown
+
 ## Important Notes
 
 - The configuration disables netrw in favor of nvim-tree
@@ -164,3 +197,4 @@ lua/josean/
 - Go files run goimports automatically on save
 - LSP diagnostic signs use nerd font icons
 - File explorer filters out `.DS_Store` files
+- Comments are yellow (`#ffff00`) and Copilot suggestions are purple (`#a855f7`) for easy visual distinction
