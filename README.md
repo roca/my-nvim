@@ -3,7 +3,7 @@
 ## From the Youtube Video: https://www.youtube.com/watch?app=desktop&v=6pAG3BHurdM&t=3178s
 ## His github is - https://github.com/josean-dev/dev-environment-files/tree/main
 
-⏰ Timestamps
+⏰ Topics by Timestamp
 00:00 - introduction 
 01:17 - initial installs
 03:03 - setup file structure
