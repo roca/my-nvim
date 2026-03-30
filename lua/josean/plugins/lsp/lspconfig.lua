@@ -63,6 +63,10 @@ return {
 		-- used to enable autocompletion (assign to every lsp server config)
 		local capabilities = cmp_nvim_lsp.default_capabilities()
 
+		-- enable show_document support so gopls can navigate to files
+		capabilities.window = capabilities.window or {}
+		capabilities.window.showDocument = { support = true }
+
 		vim.diagnostic.config({
 			signs = {
 				text = {

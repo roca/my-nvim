@@ -4,197 +4,81 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-This is a personal Neovim configuration based on Josean Martinez's setup (https://github.com/josean-dev/dev-environment-files). It uses lazy.nvim as the plugin manager and is configured primarily for web development (TypeScript/JavaScript/React/Svelte), Python, Go, and Lua development.
+Personal Neovim configuration based on [Josean Martinez's setup](https://github.com/josean-dev/dev-environment-files). Uses lazy.nvim as the plugin manager. Configured for web development (TypeScript/JavaScript/React/Svelte), Python, Go, and Lua.
 
-## Configuration Architecture
+The `dev-environment-files/` directory is a copy of the upstream reference repo — do not modify it. All active configuration lives at the repo root.
 
-### Entry Point & Module Loading
-- **init.lua**: Main entry point that loads two core modules:
-  - `josean.core`: Base configuration (options, keymaps)
-  - `josean.lazy`: Plugin manager setup
+## Architecture
 
-### Core Configuration Structure
-```
-lua/josean/
-├── core/
-│   ├── init.lua          # Loads options and keymaps
-│   ├── options.lua       # Vim options (tabstop, line numbers, etc.)
-│   └── keymaps.lua       # Global keybindings
-├── lazy.lua              # lazy.nvim setup and plugin imports
-└── plugins/              # Individual plugin configurations
-    ├── lsp/              # LSP-specific plugins
-    │   ├── lspconfig.lua # LSP configurations and keybindings
-    │   └── mason.lua     # LSP/formatter/linter installer
-    └── *.lua             # Other plugin configs (telescope, nvim-tree, etc.)
-```
+**Entry point**: `init.lua` loads two modules:
+- `josean.core` (via `lua/josean/core/init.lua`) — loads `options.lua` and `keymaps.lua`
+- `josean.lazy` (via `lua/josean/lazy.lua`) — bootstraps lazy.nvim plugin manager
 
-### Plugin System
-- Uses **lazy.nvim** for plugin management
-- Each plugin has its own configuration file in `lua/josean/plugins/`
-- Plugins are auto-imported from `josean.plugins` and `josean.plugins.lsp`
-- Plugin update checking is enabled but silent (no notifications)
-- Change detection is also silent (no notifications on config file changes)
+**Plugin system**: lazy.nvim auto-imports from two directories:
+- `lua/josean/plugins/*.lua` — general plugin configs
+- `lua/josean/plugins/lsp/*.lua` — LSP-specific configs (`lspconfig.lua`, `mason.lua`)
 
-## Key Keybindings
+Each plugin file returns a lazy.nvim spec table. To add a plugin, create a new `.lua` file in `lua/josean/plugins/` returning its spec.
 
-**Leader key**: `<Space>`
+**LSP pipeline**: mason.nvim installs servers/tools → mason-lspconfig bridges to lspconfig → lspconfig configures servers with cmp-nvim-lsp capabilities. LSP keybindings are set up via `LspAttach` autocmd in `lspconfig.lua`.
 
-### Essential Bindings
-- `jk` (insert mode): Exit to normal mode
-- `<leader>nh`: Clear search highlights
-- `<leader>+` / `<leader>-`: Increment/decrement numbers
-- `<leader>cd`: Copy current directory to clipboard
-- `<leader>ee`: Toggle file explorer (nvim-tree)
-- `<leader>ef`: Toggle file explorer on current file
-- `<leader>ff`: Fuzzy find files (Telescope)
-- `<leader>fs`: Live grep search (Telescope)
-- `<leader>fr`: Recent files (Telescope)
-- `<leader>ft`: Find todos (Telescope)
-- `<leader>se`: Search emojis (Telescope emoji picker)
+**Formatting pipeline**: conform.nvim handles format-on-save (3s timeout, LSP fallback) and manual formatting via `<leader>mp`.
 
-### Window/Split Management
-- `<leader>sv`: Split vertically
-- `<leader>sh`: Split horizontally
-- `<leader>se`: Make splits equal size
-- `<leader>sx`: Close current split
-- `<leader>st`: Open horizontal terminal
+**Linting pipeline**: nvim-lint runs on `BufEnter`, `BufWritePost`, `InsertLeave`. Currently only `pylint` is active (eslint_d is installed by mason but not configured as a linter — the eslint LSP server handles JS/TS linting instead).
 
-### Tab Management
-- `<leader>to`: Open new tab
-- `<leader>tx`: Close current tab
-- `<leader>tn`: Next tab
-- `<leader>tp`: Previous tab
-- `<leader>tf`: Open current buffer in new tab
+## Key Design Decisions
 
-### LSP Keybindings (when LSP is attached)
-- `gR`: Show LSP references (Telescope)
-- `gD`: Go to declaration
-- `gd`: Show definitions (Telescope)
-- `gi`: Show implementations (Telescope)
-- `gt`: Show type definitions (Telescope)
-- `K`: Show documentation/hover
-- `<leader>ca`: Code actions
-- `<leader>rn`: Smart rename
-- `<leader>d`: Show line diagnostics
-- `<leader>D`: Show buffer diagnostics
-- `[d` / `]d`: Previous/next diagnostic
-- `<leader>rs`: Restart LSP
-- `<leader>gh`: Inspect Go type (hover)
+- **Leader key**: `<Space>`
+- **Insert mode exit**: `jk` instead of `<Esc>`
+- **Copilot accept**: `<Shift-Tab>` (not default Tab, to avoid conflicts with nvim-cmp)
+- **netrw disabled** in favor of nvim-tree (width: 50, wider than default)
+- **auto-session**: auto-restore is disabled; manual restore with `<leader>wr`, save with `<leader>ws`
+- **tmux integration**: vim-tmux-navigator for seamless split navigation between nvim and tmux
+- **Format-on-save**: enabled globally, aggressive 3s timeout
+- **Go files**: auto-run `goimports` on save via go.nvim (separate from conform.nvim pipeline)
 
-### Formatting & Linting
-- `<leader>mp`: Format file or range (conform.nvim)
-- `<leader>l`: Trigger linting manually
+## LSP Servers (auto-installed via mason)
 
-### GitHub Copilot
-- `<Shift-Tab>` (insert mode): Accept Copilot suggestion
-- Copilot suggestions are shown in purple (`#a855f7`)
-- Auto-triggers in all filetypes by default
+ts_ls, eslint, html, cssls, tailwindcss, svelte, lua_ls, graphql, emmet_ls, prismals, pyright, gopls, templ
 
-## Language Server & Tooling Setup
+## Formatters (auto-installed via mason)
 
-### LSP Servers (auto-installed via mason.nvim)
-- **TypeScript/JavaScript**: ts_ls, eslint
-- **Web**: html, cssls, tailwindcss, emmet_ls
-- **Frameworks**: svelte
-- **GraphQL**: graphql
-- **Databases**: prismals
-- **Python**: pyright
-- **Go**: gopls, templ
-- **Lua**: lua_ls
+prettier (JS/TS/React/Svelte/CSS/HTML/JSON/YAML/Markdown/GraphQL/Liquid), stylua (Lua), isort + black (Python)
 
-### Formatters (auto-installed)
-- **prettier**: JS/TS/React/Svelte/CSS/HTML/JSON/YAML/Markdown/GraphQL
-- **stylua**: Lua
-- **isort + black**: Python
+## Theme
 
-### Linters (auto-installed)
-- **pylint**: Python
-- **eslint_d**: JavaScript/TypeScript
-
-### Format-on-Save
-- Enabled by default via conform.nvim
-- Timeout: 3000ms
-- Falls back to LSP formatting if formatter not available
-
-### Go-specific Configuration
-- Uses go.nvim plugin
-- Auto-runs `goimports` on save for Go files
-- Includes gopls LSP integration
-
-## Development Workflow
-
-### Making Configuration Changes
-1. Edit files in `lua/josean/core/` for core settings
-2. Edit files in `lua/josean/plugins/` for plugin configurations
-3. Changes take effect after `:source %` or restart
-
-### Adding New Plugins
-1. Create new file in `lua/josean/plugins/` (e.g., `my-plugin.lua`)
-2. Return a lazy.nvim plugin spec (table with plugin name and config)
-3. Plugin will be auto-loaded on next restart
-
-### Adding New LSP Servers
-1. Add server name to `ensure_installed` in `lua/josean/plugins/lsp/mason.lua`
-2. Optionally configure server-specific settings in `lua/josean/plugins/lsp/lspconfig.lua`
-3. Run `:Mason` to verify installation
-
-### Testing Configuration
-- Restart Neovim to reload configuration
-- Use `:checkhealth` to diagnose issues
-- Use `:Lazy` to manage plugins
-- Use `:Mason` to manage LSP servers/formatters/linters
-- Use `:LspInfo` to check LSP status
-- Use `:LspRestart` to restart LSP servers
+tokyonight "night" style with custom dark blue background (`#011628`). Comments are bright yellow (`#ffff00`), Copilot suggestions are purple (`#a855f7`). Transparency togglable via `transparent` variable in `colorscheme.lua`.
 
 ## Editor Settings
 
-### Indentation
-- Tab width: 2 spaces
-- Uses spaces (not tabs)
-- Auto-indent enabled
-
-### Display
-- Relative line numbers enabled
-- Line numbers colored yellow (`LineNr` highlight group)
-- Cursor line highlighted
-- Sign column always visible (for diagnostics)
+- 2-space indentation (spaces, not tabs)
+- Relative line numbers, yellow line number color
+- System clipboard (`unnamedplus`)
+- Splits open right/below
 - No line wrapping
+- Case-insensitive search with smart case
 
-### Theme Customization
-- Uses **tokyonight.nvim** with "night" style
-- Custom color scheme with dark blue background (`#011628`)
-- Comments are bright yellow (`#ffff00`) for high visibility
-- Transparency can be toggled via `transparent` variable in `colorscheme.lua`
+## Testing Configuration Changes
 
-### Clipboard
-- Uses system clipboard (`unnamedplus`)
+- Restart Neovim or `:source %` to reload
+- `:checkhealth` to diagnose issues
+- `:Lazy` to manage plugins
+- `:Mason` to manage LSP servers/formatters/linters
+- `:LspInfo` / `:LspRestart` for LSP status
 
-### Splits
-- Vertical splits open to the right
-- Horizontal splits open below
+## Notable Keybindings
 
-## Additional Plugins & Features
+Most keybindings are discoverable via which-key (press `<leader>` and wait). Key non-obvious bindings:
 
-### Emoji Support
-- **emoji.nvim** plugin enabled for markdown files
-- Integrates with nvim-cmp for emoji completion
-- Accessible via Telescope with `<leader>se`
-
-### Comment Toggling
-- **Comment.nvim** for smart commenting
-- Context-aware comments for TSX/JSX/Svelte/HTML via treesitter integration
-- Standard comment keybindings: `gcc` (line), `gbc` (block), visual mode `gc`/`gb`
-
-### GitHub Copilot Integration
-- **copilot.lua** configured for AI-powered code suggestions
-- Suggestions auto-trigger in insert mode
-- Enabled for all major filetypes including markdown
-
-## Important Notes
-
-- The configuration disables netrw in favor of nvim-tree
-- Format-on-save is aggressive (3s timeout) and enabled globally
-- Go files run goimports automatically on save
-- LSP diagnostic signs use nerd font icons
-- File explorer filters out `.DS_Store` files
-- Comments are yellow (`#ffff00`) and Copilot suggestions are purple (`#a855f7`) for easy visual distinction
+| Binding | Mode | Action |
+|---------|------|--------|
+| `jk` | insert | Exit insert mode |
+| `<S-Tab>` | insert | Accept Copilot suggestion |
+| `<C-k>`/`<C-j>` | Telescope | Navigate results up/down |
+| `<C-q>` | Telescope | Send selection to quickfix (Trouble) |
+| `<C-t>` | Telescope | Open in Trouble |
+| `<leader>l` | normal | Trigger linting manually |
+| `<leader>mp` | normal/visual | Format file or range |
+| `<leader>gh` | normal | Inspect Go type (hover) |
+| `<leader>wr` | normal | Restore session |
+| `<leader>ws` | normal | Save session |
