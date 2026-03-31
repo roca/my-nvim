@@ -18,13 +18,15 @@ The `dev-environment-files/` directory is a copy of the upstream reference repo 
 - `lua/josean/plugins/*.lua` — general plugin configs
 - `lua/josean/plugins/lsp/*.lua` — LSP-specific configs (`lspconfig.lua`, `mason.lua`)
 
-Each plugin file returns a lazy.nvim spec table. To add a plugin, create a new `.lua` file in `lua/josean/plugins/` returning its spec.
+Each plugin file returns a lazy.nvim spec table. To add a plugin, create a new `.lua` file in `lua/josean/plugins/` returning its spec. lazy.nvim silently checks for plugin updates in the background (notifications disabled in `lazy.lua`).
 
-**LSP pipeline**: mason.nvim installs servers/tools → mason-lspconfig bridges to lspconfig → lspconfig configures servers with cmp-nvim-lsp capabilities. LSP keybindings are set up via `LspAttach` autocmd in `lspconfig.lua`.
+**LSP pipeline**: mason.nvim installs servers/tools → mason-lspconfig bridges to lspconfig → lspconfig configures servers with cmp-nvim-lsp capabilities. LSP keybindings are set up via `LspAttach` autocmd in `lspconfig.lua`. A wildcard `vim.lsp.config("*")` applies shared capabilities (including gopls `showDocument` support) to all servers.
 
-**Formatting pipeline**: conform.nvim handles format-on-save (3s timeout, LSP fallback) and manual formatting via `<leader>mp`.
+**Formatting pipeline**: conform.nvim handles format-on-save (3s timeout, LSP fallback) and manual formatting via `<leader>mp`. Go files are formatted separately by go.nvim (`goimports` on save), not conform.nvim.
 
-**Linting pipeline**: nvim-lint runs on `BufEnter`, `BufWritePost`, `InsertLeave`. Currently only `pylint` is active (eslint_d is installed by mason but not configured as a linter — the eslint LSP server handles JS/TS linting instead).
+**Linting pipeline**: nvim-lint runs on `BufEnter`, `BufWritePost`, `InsertLeave`. Currently only `pylint` is active (eslint_d is installed by mason but not configured as a linter — the eslint LSP server handles JS/TS linting instead). The linting module has commented-out logic for conditionally removing eslint_d when no config file is found — this can be re-enabled if eslint_d is added back as a linter.
+
+**Commenting**: Comment.nvim with ts-context-commentstring for correct comment syntax in embedded languages (JSX/TSX/Svelte/HTML).
 
 ## Key Design Decisions
 
@@ -36,6 +38,7 @@ Each plugin file returns a lazy.nvim spec table. To add a plugin, create a new `
 - **tmux integration**: vim-tmux-navigator for seamless split navigation between nvim and tmux
 - **Format-on-save**: enabled globally, aggressive 3s timeout
 - **Go files**: auto-run `goimports` on save via go.nvim (separate from conform.nvim pipeline)
+- **Commented-out LSP configs**: Several server-specific configs in `lspconfig.lua` are commented out (svelte, graphql, emmet_ls, eslint, lua_ls). These were previously active and can be uncommented if custom per-server settings are needed again.
 
 ## LSP Servers (auto-installed via mason)
 
@@ -62,9 +65,10 @@ tokyonight "night" style with custom dark blue background (`#011628`). Comments 
 
 - Restart Neovim or `:source %` to reload
 - `:checkhealth` to diagnose issues
-- `:Lazy` to manage plugins
+- `:Lazy` to manage plugins, `:Lazy sync` to update `lazy-lock.json`
 - `:Mason` to manage LSP servers/formatters/linters
 - `:LspInfo` / `:LspRestart` for LSP status
+- After editing a plugin file, the simplest verification is restarting Neovim and checking `:Lazy` for errors
 
 ## Notable Keybindings
 
@@ -82,3 +86,6 @@ Most keybindings are discoverable via which-key (press `<leader>` and wait). Key
 | `<leader>gh` | normal | Inspect Go type (hover) |
 | `<leader>wr` | normal | Restore session |
 | `<leader>ws` | normal | Save session |
+| `<leader>st` | normal | Open horizontal terminal split |
+| `<leader>cd` | normal | Copy current working directory to clipboard |
+| `<leader>se` | normal | Search emoji (Telescope, markdown files) |
