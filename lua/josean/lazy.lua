@@ -13,6 +13,11 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({ { import = "josean.plugins" }, { import = "josean.plugins.lsp" } }, {
+  git = {
+    -- Fetch over SSH: corporate Zscaler TLS interception intermittently resets
+    -- HTTPS connections to github.com, which surfaces as SSL_ERROR_SYSCALL.
+    url_format = "git@github.com:%s.git",
+  },
   checker = {
     enabled = true,
     notify = false,
