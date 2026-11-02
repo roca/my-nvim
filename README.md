@@ -36,3 +36,5 @@
 1:17:31 - linting
 1:20:39 - git integration
 1:26:03 - conclusion
+
+## Lazygit youtube video: https://www.youtube.com/watch?v=Ihg37znaiBo
