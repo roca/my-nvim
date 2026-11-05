@@ -8,7 +8,7 @@ Personal Neovim configuration based on [Josean Martinez's setup](https://github.
 
 **Requires Neovim 0.11+** — the LSP setup uses the native `vim.lsp.config()` / `vim.lsp.enable()` API, which does not exist in 0.10 or earlier.
 
-The `dev-environment-files/` directory is a copy of the upstream reference repo — do not modify it. All active configuration lives at the repo root. Both `dev-environment-files/` and `pack/` are gitignored, so they will appear in the working tree but never in diffs.
+The `dev-environment-files/` directory is a copy of the upstream reference repo — do not modify it. All active configuration lives at the repo root. Both `dev-environment-files/` and `pack/` are gitignored, so they may appear in the working tree but never in diffs.
 
 `.github/workflows/` contains Claude Code GitHub Actions (`claude.yml`, `claude-code-review.yml`) — these automate PR review for this repo and are unrelated to the Neovim config itself.
 
@@ -46,6 +46,7 @@ Critically, there are **no per-server `setup()` calls** — enabling is automati
 - **tmux integration**: vim-tmux-navigator for seamless split navigation between nvim and tmux
 - **Format-on-save**: enabled globally, aggressive 3s timeout
 - **Go files**: auto-run `goimports` on save via go.nvim (separate from conform.nvim pipeline)
+- **Custom filetype mappings** live in `core/options.lua` via `vim.filetype.add()`. Currently `.gohtml` (Go html templates) → `html`. Because prettier does not understand `{{ }}` template syntax, `format_on_save` in `formatting.lua` is a function that skips `.gohtml` buffers (by filename, since their filetype is plain `html`). Manual `<leader>mp` still formats them.
 - **Commented-out LSP configs**: Several server-specific configs in `lspconfig.lua` are commented out (svelte, graphql, emmet_ls, eslint, lua_ls). These were previously active and can be uncommented if custom per-server settings are needed again. They are safe to leave commented because mason-lspconfig auto-enables the servers regardless.
 - **Plugins are fetched over SSH**, not HTTPS: `lazy.lua` sets `git.url_format = "git@github.com:%s.git"` because Zscaler TLS interception on this machine intermittently resets HTTPS connections to github.com (`LibreSSL SSL_connect: SSL_ERROR_SYSCALL`). **This makes a working GitHub SSH key a hard prerequisite** — on a fresh machine without one, no plugin will install. Drop the `git` block to fall back to HTTPS. Note that lazy.nvim's bootstrap clone at the top of `lazy.lua` still uses HTTPS deliberately, so lazy itself can install before any key exists. If you ever change `url_format`, also rewrite the existing plugin remotes (`git -C <dir> remote set-url origin ...`) — on an origin/url mismatch lazy **deletes and re-clones** the plugin rather than fixing the remote, which would re-trigger every `build` step.
 - **treesitter is pinned to `branch = "master"`** and set `lazy = false`. Do not "upgrade" it to the `main` branch — that is a breaking rewrite with a different config API that would invalidate `treesitter.lua` entirely.
@@ -88,6 +89,11 @@ Colors set outside tokyonight: line numbers are yellow (`LineNr` in `core/option
 - `:Mason` to manage LSP servers/formatters/linters
 - `:LspInfo` / `:LspRestart` for LSP status
 - After editing a plugin file, the simplest verification is restarting Neovim and checking `:Lazy` for errors
+
+From a non-interactive shell (e.g. Claude Code), verify headlessly instead:
+
+- `nvim --headless +qa` — loads the full config; **no output means clean startup**. Note the exit code is 0 even when errors are printed, so check the output, not `$?`.
+- `nvim --headless -c 'lua print(<expr>)' +qa` — evaluate config state, e.g. `vim.filetype.match({filename="x.gohtml"})` to confirm filetype detection.
 
 ## Notable Keybindings
 

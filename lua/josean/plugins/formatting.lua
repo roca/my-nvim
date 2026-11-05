@@ -21,11 +21,17 @@ return {
         lua = { "stylua" },
         python = { "isort", "black" },
       },
-      format_on_save = {
-        lsp_fallback = true,
-        async = false,
-        timeout_ms = 3000,
-      },
+      format_on_save = function(bufnr)
+        -- skip Go html templates: prettier doesn't understand {{ }} syntax
+        if vim.api.nvim_buf_get_name(bufnr):match("%.gohtml$") then
+          return
+        end
+        return {
+          lsp_fallback = true,
+          async = false,
+          timeout_ms = 3000,
+        }
+      end,
     })
 
     vim.keymap.set({ "n", "v" }, "<leader>mp", function()
